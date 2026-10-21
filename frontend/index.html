@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EventHub</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+<aside class="sidebar">
+  <div class="brand"><span class="logo">E</span><div><b>EventHub</b><small>College Event Registration</small></div></div>
+  <nav>
+    <button class="on" data-page="events">Events</button>
+    <button data-page="registrations">Registrations</button>
+    <button data-page="notifications">Notifications</button>
+    <button data-page="status">System Status</button>
+  </nav>
+  <div class="arch">
+    <b>Distributed architecture</b>
+    <span>Gateway: port 8080</span>
+    <span>Services: 4001, 4002, 4003</span>
+    <span>Database: MongoDB</span>
+  </div>
+</aside>
+
+<main>
+  <section id="page-events" class="page on">
+    <header><h1>Upcoming Events</h1><p>Enter your name, then click Register on any event with seats left.</p></header>
+    <div class="toolbar">
+      <label>Student name <input id="studentName" placeholder="e.g. Namrata" maxlength="30" /></label>
+      <span id="eventsServedBy" class="tag"></span>
+      <button id="refreshEvents">Refresh</button>
+    </div>
+    <div id="eventList" class="events"></div>
+  </section>
+
+  <section id="page-registrations" class="page">
+    <header><h1>Registrations</h1><p>Every registration handled by the Registration Service.</p></header>
+    <table><thead><tr><th>Registration ID</th><th>Student</th><th>Event</th><th>Registered at</th><th>Status</th><th></th></tr></thead><tbody id="regRows"></tbody></table>
+  </section>
+
+  <section id="page-notifications" class="page">
+    <header><h1>Notifications</h1><p>Messages created by the Notification Service after each registration or cancellation.</p></header>
+    <ul id="notes" class="notes"></ul>
+  </section>
+
+  <section id="page-status" class="page">
+    <header><h1>System Status</h1><p>Health of every service, checked through the API Gateway.</p></header>
+    <div class="toolbar"><span id="overall" class="tag"></span><button id="refreshStatus">Check again</button></div>
+    <table><thead><tr><th>Service</th><th>Status</th><th>Response time</th><th>Answered by (pod)</th></tr></thead><tbody id="statusRows"></tbody></table>
+
+    <h2>Load balancing test</h2>
+    <p>Sends 12 requests to the Event Service. With more than one replica running, the requests are shared between pods.</p>
+    <button id="loadTest" class="primary">Run test</button>
+    <div id="loadResult"></div>
+  </section>
+</main>
+
+<div id="toast" class="toast"></div>
+<script src="app.js"></script>
+</body>
+</html>

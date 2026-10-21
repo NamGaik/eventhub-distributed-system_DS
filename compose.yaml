@@ -1,0 +1,55 @@
+# Runs all EventHub containers on one shared Docker network.
+# Containers reach each other by service name (for example http://event-service:4001).
+services:
+  mongo:
+    image: mongo:7
+    volumes:
+      - mongo-data:/data/db
+
+  event-service:
+    build: ./event-service
+    image: eventhub/event-service:v1
+    environment:
+      PORT: 4001
+      MONGO_URL: mongodb://mongo:27017
+    depends_on: [mongo]
+
+  registration-service:
+    build: ./registration-service
+    image: eventhub/registration-service:v1
+    environment:
+      PORT: 4002
+      MONGO_URL: mongodb://mongo:27017
+      EVENT_SERVICE_URL: http://event-service:4001
+      NOTIFICATION_SERVICE_URL: http://notification-service:4003
+    depends_on: [mongo, event-service, notification-service]
+
+  notification-service:
+    build: ./notification-service
+    image: eventhub/notification-service:v1
+    environment:
+      PORT: 4003
+      MONGO_URL: mongodb://mongo:27017
+    depends_on: [mongo]
+
+  api-gateway:
+    build: ./api-gateway
+    image: eventhub/api-gateway:v1
+    environment:
+      PORT: 8080
+      EVENT_SERVICE_URL: http://event-service:4001
+      REGISTRATION_SERVICE_URL: http://registration-service:4002
+      NOTIFICATION_SERVICE_URL: http://notification-service:4003
+    ports:
+      - "8080:8080"
+    depends_on: [event-service, registration-service, notification-service]
+
+  frontend:
+    build: ./frontend
+    image: eventhub/frontend:v1
+    ports:
+      - "3000:80"
+    depends_on: [api-gateway]
+
+volumes:
+  mongo-data:
